@@ -32,16 +32,14 @@ class PostCommentController extends Controller
     public function store(Request $request, $aId)
     {
         $rules = [
-            'author_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
             'description' => 'required'
         ];
 
         $this->validate($request, $rules);
 
         $post = Post::query()->findOrFail($aId);
-        $comment = $post
-            ->comments()
-            ->create($request->all());
+        $comment = $post->comments()->create($request->all());
 
         return response()->json([
             'data' => $comment
@@ -54,9 +52,12 @@ class PostCommentController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Post $post, Comment $comment)
+    public function show($aId, $bId)
     {
+        $post = Post::findOrFail($aId);
+        $comment = Comment::findOrFail($bId);
         $this->check($post, $comment);
+
         return response()->json([
             'data' => $comment
         ]);

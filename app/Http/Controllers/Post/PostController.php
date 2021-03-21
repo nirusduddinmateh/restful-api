@@ -4,16 +4,13 @@ namespace App\Http\Controllers\Post;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Traits\APIResponse;
+use App\Transformers\PostTransformer;
+use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
-
-    use APIResponse;
-
-    // test edit
-
     /**
      * Display a listing of the resource.
      *
@@ -21,26 +18,21 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::query();
-
-        $posts = $this->filterAndSort($posts);
-
-        return response()->json([
-            'data' => $posts->get()
-        ]);
+        $posts = Post::query()->paginate();
+        $posts = fractal($posts, new PostTransformer())->toArray();
+        return response()->json($posts);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         $rules = [
-            'author_id' => 'required',
-            'title' => 'required',
+            'title'  => 'required',
             'description' => 'required'
         ];
 
@@ -56,11 +48,12 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Post $post)
+    public function show($id)
     {
+        $post = Post::query()->findOrFail($id);
         return response()->json([
             'data' => $post
         ]);
@@ -69,18 +62,20 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, Post $post)
+    public function update(Request $request, $id)
     {
+        $post = Post::query()->findOrFail($id);
+
         $post->fill($request->all());
 
         if (!$post->isDirty()) {
             return response()->json([
                 'error' => 'คุณจำเป็นต้องระบุค่าที่แตกต่างเพื่อการปรับปรุงข้อมูล!',
-                'code' => 422
+                'code'  => 422
             ], 422);
         }
 
@@ -94,11 +89,13 @@ class PostController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Post $post)
+    public function destroy($id)
     {
+        $post = Post::query()->findOrFail($id);
+
         $post->delete();
 
         return response()->json([
