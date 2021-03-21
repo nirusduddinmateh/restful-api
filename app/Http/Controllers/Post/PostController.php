@@ -12,6 +12,8 @@ class PostController extends Controller
 
     use APIResponse;
 
+    // test edit
+
     /**
      * Display a listing of the resource.
      *
