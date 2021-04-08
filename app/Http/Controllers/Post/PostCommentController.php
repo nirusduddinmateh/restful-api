@@ -32,7 +32,7 @@ class PostCommentController extends Controller
     public function store(Request $request, $aId)
     {
         $rules = [
-            'user_id' => 'required|exists:users,id',
+            'author_id' => 'required|exists:users,id',
             'description' => 'required'
         ];
 
@@ -54,8 +54,8 @@ class PostCommentController extends Controller
      */
     public function show($aId, $bId)
     {
-        $post = Post::findOrFail($aId);
-        $comment = Comment::findOrFail($bId);
+        $post = Post::query()->findOrFail($aId);
+        $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
 
         return response()->json([
@@ -72,8 +72,8 @@ class PostCommentController extends Controller
      */
     public function update(Request $request, $aId, $bId)
     {
-        $post = Post::findOrFail($aId);
-        $comment = Comment::findOrFail($bId);
+        $post = Post::query()->findOrFail($aId);
+        $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
 
         if ($request->has('description')) {
@@ -94,8 +94,8 @@ class PostCommentController extends Controller
      */
     public function destroy($aId, $bId)
     {
-        $post = Post::findOrFail($aId);
-        $comment = Comment::findOrFail($bId);
+        $post = Post::query()->findOrFail($aId);
+        $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
 
         $comment->delete();

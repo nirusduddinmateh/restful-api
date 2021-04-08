@@ -4,10 +4,7 @@ namespace App\Http\Controllers\Post;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
-use App\Transformers\PostTransformer;
-use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -18,9 +15,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::query()->paginate();
-        $posts = fractal($posts, new PostTransformer())->toArray();
-        return response()->json($posts);
+        $posts = Post::query()->with('author')->paginate();
+        return response()->json(['data' => $posts]);
     }
 
     /**
@@ -48,12 +44,11 @@ class PostController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param Post $post
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($id)
+    public function show(Post $post)
     {
-        $post = Post::query()->findOrFail($id);
         return response()->json([
             'data' => $post
         ]);
@@ -62,14 +57,12 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param Post $post
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Post $post)
     {
-        $post = Post::query()->findOrFail($id);
-
         $post->fill($request->all());
 
         if (!$post->isDirty()) {
@@ -92,12 +85,9 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        $post = Post::query()->findOrFail($id);
-
         $post->delete();
-
         return response()->json([
             'deleted' => true,
             'data' => $post
