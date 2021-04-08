@@ -44,10 +44,6 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
-    /*
-     *
-     *  one to many
-     * */
     public function posts()
     {
         return $this->hasMany(Post::class, 'author_id', 'id');
@@ -68,6 +64,8 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(User::class, 'user_follow');
     }
+
+    // Rest omitted for brevity
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

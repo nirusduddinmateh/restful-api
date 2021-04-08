@@ -118,6 +118,12 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/lcobucci/jwt" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/tymon/jwt-auth" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/namshi/jose" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/barryvdh/laravel-debugbar" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/maximebf/debugbar" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/symfony/debug" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/laravel-fractal" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/spatie/fractalistic" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/league/fractal" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

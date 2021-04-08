@@ -1,7 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\Post\PostController;
+use App\Http\Controllers\Post\PostCommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,11 +17,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-use App\Http\Controllers\AuthController;
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
@@ -29,14 +27,7 @@ Route::group([
     Route::post('me', AuthController::class.'@me');
 });
 
-use App\Http\Controllers\User\UserController;
-Route::resource('users', UserController::class, ['except' => ['create', 'edit']])
-    ->middleware('auth:api');
-
-use App\Http\Controllers\Post\PostController;
-use App\Http\Controllers\Post\PostCommentController;
-
+Route::resource('users', UserController::class, ['except' => ['create', 'edit']]);
 Route::resource('posts', PostController::class, ['except' => ['create', 'edit']]);
-
 Route::resource('posts.comments', PostCommentController::class, ['except' => ['create', 'edit']]);
 

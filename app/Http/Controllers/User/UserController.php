@@ -4,13 +4,12 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Traits\APIResponse;
+use App\Transformers\UserTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
-    use APIResponse;
     /**
      * Display a listing of the resource.
      *
@@ -18,11 +17,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::query();
-
-        $users = $this->filterAndSort($users);
-
-        return response()->json($users);
+        $users = User::query()->paginate();
+        return response()->json(['data' => $users]);
     }
 
     /**
@@ -36,7 +32,7 @@ class UserController extends Controller
         $rules = [
             'name'  => 'required',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:6',
+            'password' => 'required|min:6|confirmed',
         ];
 
         $this->validate($request, $rules);

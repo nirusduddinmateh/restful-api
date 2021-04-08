@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\FileUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -14,6 +15,15 @@ class Post extends Model
         'title',
         'description',
         'img'
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'img' => FileUrl::class,
     ];
 
     public function author()

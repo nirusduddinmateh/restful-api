@@ -39,9 +39,7 @@ class PostCommentController extends Controller
         $this->validate($request, $rules);
 
         $post = Post::query()->findOrFail($aId);
-        $comment = $post
-            ->comments()
-            ->create($request->all());
+        $comment = $post->comments()->create($request->all());
 
         return response()->json([
             'data' => $comment
@@ -54,9 +52,12 @@ class PostCommentController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Post $post, Comment $comment)
+    public function show($aId, $bId)
     {
+        $post = Post::query()->findOrFail($aId);
+        $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
+
         return response()->json([
             'data' => $comment
         ]);
@@ -71,8 +72,8 @@ class PostCommentController extends Controller
      */
     public function update(Request $request, $aId, $bId)
     {
-        $post = Post::findOrFail($aId);
-        $comment = Comment::findOrFail($bId);
+        $post = Post::query()->findOrFail($aId);
+        $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
 
         if ($request->has('description')) {
@@ -93,8 +94,8 @@ class PostCommentController extends Controller
      */
     public function destroy($aId, $bId)
     {
-        $post = Post::findOrFail($aId);
-        $comment = Comment::findOrFail($bId);
+        $post = Post::query()->findOrFail($aId);
+        $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
 
         $comment->delete();
