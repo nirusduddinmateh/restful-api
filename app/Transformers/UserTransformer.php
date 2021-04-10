@@ -7,6 +7,14 @@ use League\Fractal\TransformerAbstract;
 
 class UserTransformer extends TransformerAbstract
 {
+    /**
+     * List of resources to automatically include
+     *
+     * @var array
+     */
+    protected $defaultIncludes = [
+
+    ];
 
     /**
      * List of resources possible to include
@@ -14,7 +22,7 @@ class UserTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'posts'
+
     ];
 
     /**
@@ -25,9 +33,9 @@ class UserTransformer extends TransformerAbstract
     public function transform(User $model)
     {
         return [
-            'id'    => $model->id,
-            'name'  => $model->name,
-            'email' => $model->email
+            'id' => $model->id,
+            'email' => $model->email,
+            'name' => $model->name,
         ];
     }
 }

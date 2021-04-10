@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Post;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Serializers\CustomSerializer;
+use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -15,8 +19,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::query()->with('author')->paginate();
-        return response()->json($posts);
+        $posts = Post::query()->with('author')->orderBy('id', 'desc')->paginate();
+        return response()->json($this->transform($posts));
     }
 
     /**
@@ -29,16 +33,19 @@ class PostController extends Controller
     {
         $rules = [
             'title'  => 'required',
-            'description' => 'required'
+            'description' => 'required',
+            'img' => 'required|image',
         ];
 
         $this->validate($request, $rules);
 
-        $post = Post::query()->create($request->all());
+        $data = $request->all();
+        $data['img'] = $request->img->store('public/posts');
+        $data['author_id'] = Auth::user()->id;
 
-        return response()->json([
-            'data' => $post
-        ], 201);
+        $post = Post::query()->create($data);
+
+        return response()->json($this->transform($post), 201);
     }
 
     /**
@@ -49,9 +56,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return response()->json([
-            'data' => $post
-        ]);
+        return response()->json($this->transform($post));
     }
 
     /**
@@ -63,9 +68,22 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        $post->fill($request->all());
+        $rules = [
+            'img' => 'image',
+        ];
+        $this->validate($request, $rules);
 
-        if (!$post->isDirty()) {
+        $post->fill($request->only([
+            'title',
+            'description'
+        ]));
+
+        if ($request->hasFile('img')) {
+            Storage::delete($post->img);
+            $post->img = $request->img->store('public/posts');
+        }
+
+        if ($post->isClean()) {
             return response()->json([
                 'error' => 'คุณจำเป็นต้องระบุค่าที่แตกต่างเพื่อการปรับปรุงข้อมูล!',
                 'code'  => 422
@@ -74,9 +92,7 @@ class PostController extends Controller
 
         $post->save();
 
-        return response()->json([
-            'data' => $post
-        ]);
+        return response()->json($this->transform($post));
     }
 
     /**
@@ -88,9 +104,13 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         $post->delete();
-        return response()->json([
-            'deleted' => true,
-            'data' => $post
-        ]);
+        Storage::delete($post->img);
+
+        return response()->json($this->transform($post));
+    }
+
+    private function transform($data)
+    {
+        return fractal($data, new PostTransformer(), new CustomSerializer())->toArray();
     }
 }

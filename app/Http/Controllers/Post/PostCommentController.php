@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Post;
 use App\Http\Controllers\Controller;
 use App\Models\Comment;
 use App\Models\Post;
+use App\Serializers\CustomSerializer;
+use App\Transformers\CommentTransformer;
+use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PostCommentController extends Controller
@@ -18,7 +22,7 @@ class PostCommentController extends Controller
     public function index($aId)
     {
         $post = Post::query()->findOrFail($aId);
-        return response()->json($post->comments);
+        return response()->json($this->transform($post->comments));
     }
 
     /**
@@ -30,18 +34,19 @@ class PostCommentController extends Controller
     public function store(Request $request, $aId)
     {
         $rules = [
-            'author_id' => 'required|exists:users,id',
             'description' => 'required'
         ];
 
         $this->validate($request, $rules);
 
         $post = Post::query()->findOrFail($aId);
-        $comment = $post->comments()->create($request->all());
 
-        return response()->json([
-            'data' => $comment
-        ], 201);
+        $data = $request->all();
+        $data['author_id'] = Auth::user()->id;
+
+        $comment = $post->comments()->create($data);
+
+        return response()->json($this->transform($comment), 201);
     }
 
     /**
@@ -56,9 +61,7 @@ class PostCommentController extends Controller
         $comment = Comment::query()->findOrFail($bId);
         $this->check($post, $comment);
 
-        return response()->json([
-            'data' => $comment
-        ]);
+        return response()->json($this->transform($comment));
     }
 
     /**
@@ -79,9 +82,7 @@ class PostCommentController extends Controller
             $comment->save();
         }
 
-        return response()->json([
-            'data' => $comment
-        ]);
+        return response()->json($this->transform($comment));
     }
 
     /**
@@ -98,10 +99,7 @@ class PostCommentController extends Controller
 
         $comment->delete();
 
-        return response()->json([
-            'deleted' => true,
-            'data' => $comment
-        ]);
+        return response()->json($this->transform($comment));
     }
 
     protected function check($post, $comment)
@@ -109,5 +107,10 @@ class PostCommentController extends Controller
         if ($post->id != $comment->post_id) {
             throw new HttpException(422, 'ความสัมพันธ์ของข้อมูลที่ไม่ถูกต้อง');
         }
+    }
+
+    private function transform($data)
+    {
+        return fractal($data, new CommentTransformer(), new CustomSerializer())->toArray();
     }
 }

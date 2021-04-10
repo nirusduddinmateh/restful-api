@@ -13,7 +13,7 @@ class PostTransformer extends TransformerAbstract
      * @var array
      */
     protected $defaultIncludes = [
-        //
+        'author',
     ];
 
     /**
@@ -38,6 +38,7 @@ class PostTransformer extends TransformerAbstract
             'author_id' => $model->author_id,
             'title' => $model->title,
             'description' => $model->description,
+            'img' => $model->img,
             'created_date' => $model->created_at,
             'updated_date' => $model->updated_at,
         ];
@@ -52,7 +53,7 @@ class PostTransformer extends TransformerAbstract
     {
         $author = $model->author;
 
-        return $this->item($author, new UserTransformer());
+        return $this->item($author, new UserTransformer(), false);
     }
 
     /**
@@ -64,6 +65,6 @@ class PostTransformer extends TransformerAbstract
     public function includeComments(Post $model)
     {
         $comments = $model->comments;
-        return $this->collection($comments, new CommentTransformer);
+        return $this->collection($comments, new CommentTransformer, false);
     }
 }
