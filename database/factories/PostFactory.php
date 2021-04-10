@@ -28,7 +28,7 @@ class PostFactory extends Factory
             'author_id' => $this->faker->randomElement($usersIDs),
             'title' => $this->faker->realText(50),
             'description' => $this->faker->text,
-            'img' => null
+            'img' => 'posts/'.rand(1,3).'.jpg'
         ];
     }
 }
