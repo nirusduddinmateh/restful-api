@@ -18,9 +18,7 @@ class PostCommentController extends Controller
     public function index($aId)
     {
         $post = Post::query()->findOrFail($aId);
-        return response()->json([
-            'data' => $post->comments
-        ]);
+        return response()->json($post->comments);
     }
 
     /**

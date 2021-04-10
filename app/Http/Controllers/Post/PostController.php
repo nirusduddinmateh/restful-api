@@ -16,7 +16,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::query()->with('author')->paginate();
-        return response()->json(['data' => $posts]);
+        return response()->json($posts);
     }
 
     /**
