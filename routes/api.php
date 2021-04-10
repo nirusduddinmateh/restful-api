@@ -21,13 +21,17 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
 ], function () {
-    Route::post('login', AuthController::class.'@login');
-    Route::post('logout', AuthController::class.'@logout');
-    Route::post('refresh', AuthController::class.'@refresh');
-    Route::post('me', AuthController::class.'@me');
+    Route::post('login', AuthController::class . '@login');
+    Route::post('logout', AuthController::class . '@logout');
+    Route::post('refresh', AuthController::class . '@refresh');
+    Route::post('me', AuthController::class . '@me');
 });
 
-Route::resource('users', UserController::class, ['except' => ['create', 'edit']]);
-Route::resource('posts', PostController::class, ['except' => ['create', 'edit']]);
-Route::resource('posts.comments', PostCommentController::class, ['except' => ['create', 'edit']]);
+Route::group([
+    'middleware' => 'auth'
+], function () {
+    Route::resource('users', UserController::class, ['except' => ['create', 'edit']]);
+    Route::resource('posts', PostController::class, ['except' => ['create', 'edit']]);
+    Route::resource('posts.comments', PostCommentController::class, ['except' => ['create', 'edit']]);
+});
 
