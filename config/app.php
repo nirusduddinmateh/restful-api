@@ -178,7 +178,6 @@ return [
         /*
          * 3rd party
          */
-        Barryvdh\Debugbar\ServiceProvider::class,
     ],
 
     /*

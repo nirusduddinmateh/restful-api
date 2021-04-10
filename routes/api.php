@@ -29,7 +29,7 @@ Route::group([
 });
 
 Route::group([
-    'middleware' => 'auth'
+    'middleware' => 'auth:api'
 ], function () {
     Route::resource('users', UserController::class, ['except' => ['create', 'edit']]);
     Route::resource('posts', PostController::class, ['except' => ['create', 'edit']]);
