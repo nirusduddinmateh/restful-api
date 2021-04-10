@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
 class AuthController extends Controller
 {
     /**
@@ -13,8 +17,31 @@ class AuthController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api')->except([
-            'login'
+            'login',
+            'register'
         ]);
+    }
+
+    public function register(Request $request)
+    {
+        $rules = [
+            'name'  => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
+        ];
+
+        $this->validate($request, $rules);
+
+        $data = $request->all();
+        $data['password'] = bcrypt($data['password']); // encrypt password before store to database
+        $data['email_verified_at'] = now(); // verified
+        $data['remember_token'] = Str::random(10);
+
+        $user = User::query()->create($data);
+
+        return response()->json([
+            'data' => $user
+        ], 201);
     }
 
     /**
