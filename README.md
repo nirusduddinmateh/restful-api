@@ -7,4 +7,5 @@
 5. รันคำสั่ง ```copy .env.example .env``` ***Windows
 6. รันคำสั่ง ```php artisan migrate```
 7. รันคำสั่ง ```php artisan db:seed```
-8. รันคำสั่ง ```php artisan serve```
+8. รันคำสั่ง ```php artisan storage:link```
+9. รันคำสั่ง ```php artisan serve```
