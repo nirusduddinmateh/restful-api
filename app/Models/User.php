@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Casts\Date2;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,8 +43,11 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at' => Date2::class,
+        'created_at' => Date2::class,
+        'updated_at' => Date2::class,
     ];
+
 
     public function posts()
     {
