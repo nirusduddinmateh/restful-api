@@ -22,7 +22,7 @@ class UserTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-
+        'posts'
     ];
 
     /**
@@ -36,6 +36,19 @@ class UserTransformer extends TransformerAbstract
             'id' => $model->id,
             'email' => $model->email,
             'name' => $model->name,
+            'role' => $model->role,
+            'created_date' => $model->created_at,
         ];
+    }
+
+    /**
+     * Include Posts
+     *
+     * @param User $model
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includePosts(User $model)
+    {
+        return $this->collection($model->posts, new PostTransformer(), false);
     }
 }

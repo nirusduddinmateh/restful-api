@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Casts\Date2;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -23,6 +22,7 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'email_verified_at',
         'password',
+        'role'
     ];
 
     /**
@@ -54,23 +54,10 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Post::class, 'author_id', 'id');
     }
 
-    /**
-     * Get all of the following.
-     */
-    public function following()
+    public function isRole()
     {
-        return $this->belongsToMany(User::class, 'user_follow', 'follow_id', 'user_id');
+        return $this->role;
     }
-
-    /**
-     * Get all of the followers.
-     */
-    public function followers()
-    {
-        return $this->belongsToMany(User::class, 'user_follow');
-    }
-
-    // Rest omitted for brevity
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\Date2;
 use App\Casts\FileUrl;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,6 +25,8 @@ class Post extends Model
      */
     protected $casts = [
         'img' => FileUrl::class,
+        'created_at' => Date2::class,
+        'updated_at' => Date2::class,
     ];
 
     public function author()

@@ -7,9 +7,9 @@ use App\Models\Comment;
 use App\Models\Post;
 use App\Serializers\CustomSerializer;
 use App\Transformers\CommentTransformer;
-use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PostCommentController extends Controller
@@ -19,9 +19,9 @@ class PostCommentController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index($aId)
+    public function index($postId)
     {
-        $post = Post::query()->findOrFail($aId);
+        $post = Post::query()->findOrFail($postId);
         return response()->json($this->transform($post->comments));
     }
 
@@ -30,8 +30,9 @@ class PostCommentController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request, $aId)
+    public function store(Request $request, $postId)
     {
         $rules = [
             'description' => 'required'
@@ -39,7 +40,7 @@ class PostCommentController extends Controller
 
         $this->validate($request, $rules);
 
-        $post = Post::query()->findOrFail($aId);
+        $post = Post::query()->findOrFail($postId);
 
         $data = $request->all();
         $data['author_id'] = Auth::user()->id;
@@ -55,10 +56,10 @@ class PostCommentController extends Controller
      * @param int $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($aId, $bId)
+    public function show($postId, $commentId)
     {
-        $post = Post::query()->findOrFail($aId);
-        $comment = Comment::query()->findOrFail($bId);
+        $post = Post::query()->findOrFail($postId);
+        $comment = Comment::query()->findOrFail($commentId);
         $this->check($post, $comment);
 
         return response()->json($this->transform($comment));
@@ -68,13 +69,14 @@ class PostCommentController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param int $id
+     * @param $postId
+     * @param $commentId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $aId, $bId)
+    public function update(Request $request, $postId, $commentId)
     {
-        $post = Post::query()->findOrFail($aId);
-        $comment = Comment::query()->findOrFail($bId);
+        $post = Post::query()->findOrFail($postId);
+        $comment = Comment::query()->findOrFail($commentId);
         $this->check($post, $comment);
 
         if ($request->has('description')) {
@@ -88,24 +90,25 @@ class PostCommentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param int $id
+     * @param $postId
+     * @param $commentId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($aId, $bId)
+    public function destroy($postId, $commentId)
     {
-        $post = Post::query()->findOrFail($aId);
-        $comment = Comment::query()->findOrFail($bId);
+        $post = Post::query()->findOrFail($postId);
+        $comment = Comment::query()->findOrFail($commentId);
         $this->check($post, $comment);
 
         $comment->delete();
 
-        return response()->json($this->transform($comment));
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
     protected function check($post, $comment)
     {
         if ($post->id != $comment->post_id) {
-            throw new HttpException(422, 'ความสัมพันธ์ของข้อมูลที่ไม่ถูกต้อง');
+            throw new HttpException(422, 'กรุณาตรวจสอบความสัมพันธ์ของข้อมูล!');
         }
     }
 

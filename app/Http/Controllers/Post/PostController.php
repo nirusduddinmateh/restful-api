@@ -9,6 +9,7 @@ use App\Transformers\PostTransformer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 
 class PostController extends Controller
 {
@@ -83,12 +84,7 @@ class PostController extends Controller
             $post->img = $request->img->store('public/posts');
         }
 
-        if ($post->isClean()) {
-            return response()->json([
-                'error' => 'คุณจำเป็นต้องระบุค่าที่แตกต่างเพื่อการปรับปรุงข้อมูล!',
-                'code'  => 422
-            ], 422);
-        }
+        abort_if($post->isClean(), 422, 'คุณจำเป็นต้องระบุค่าที่แตกต่างเพื่อการปรับปรุงข้อมูล');
 
         $post->save();
 
@@ -106,7 +102,7 @@ class PostController extends Controller
         $post->delete();
         Storage::delete($post->img);
 
-        return response()->json($this->transform($post));
+        return response()->json(null, Response::HTTP_NO_CONTENT);
     }
 
     private function transform($data)

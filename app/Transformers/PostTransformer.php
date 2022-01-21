@@ -52,7 +52,6 @@ class PostTransformer extends TransformerAbstract
     public function includeAuthor(Post $model)
     {
         $author = $model->author;
-
         return $this->item($author, new UserTransformer(), false);
     }
 
